@@ -1,0 +1,17 @@
+name: 'Hello World'
+description: 'Greet someone'
+inputs:
+  command:  # id of input
+    description: 'test command'
+    type: boolean
+    required: false
+    default: false
+runs:
+  using: "composite"
+  steps:
+    - name: Set Greeting
+      if: ${{ inputs.command }} == false
+      run: echo "Command $INPUT_WHO_TO_GREET."
+      shell: bash
+      env:
+        INPUT_WHO_TO_GREET: ${{ inputs.command }}
