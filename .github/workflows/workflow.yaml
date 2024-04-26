@@ -47,4 +47,4 @@ jobs:
 
             - [Work this week](https://github.com/orgs/github/projects/3)
           PINNED: false
-          CLOSE_PREVIOUS: false
+          CLOSE_PREVIOUS: true
