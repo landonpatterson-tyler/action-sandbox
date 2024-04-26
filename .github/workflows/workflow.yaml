@@ -11,7 +11,7 @@ jobs:
     steps:
       - name: Create team sync issue
         run: |
-          if [[ $CLOSE_PREVIOUS == 'true' ]]; then
+          if [[ $CLOSE_PREVIOUS == true ]]; then
             previous_issue_number=$(gh issue list \
               --label "$LABELS" \
               --json number \
@@ -24,6 +24,7 @@ jobs:
           new_issue_url=$(gh issue create \
             --title "$TITLE" \
             --assignee "$ASSIGNEES" \
+            --label "$LABELS" \
             --body "$BODY")
           if [[ $PINNED == true ]]; then
             gh issue pin "$new_issue_url"
@@ -33,7 +34,7 @@ jobs:
           GH_REPO: ${{ github.repository }}
           TITLE: Test
           ASSIGNEES: landonpatterson-tyler
-          LABELS: weekly sync,docs-team
+          LABELS: enhancement
           BODY: |
             ### Agenda
 
