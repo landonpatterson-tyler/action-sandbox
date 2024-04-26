@@ -11,7 +11,7 @@ jobs:
     steps:
       - name: Create team sync issue
         run: |
-          if [[ $CLOSE_PREVIOUS == true ]]; then
+          if [[ $CLOSE_PREVIOUS == 'true' ]]; then
             previous_issue_number=$(gh issue list \
               --label "$LABELS" \
               --json number \
