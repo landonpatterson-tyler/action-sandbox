@@ -21,7 +21,7 @@ jobs:
         run: |
           mess="$(~/.composer/vendor/bin/phpmd . json cleancode --suffixes php --exclude vendor,tests | jq -r '.files[] | .file as $file | .violations[] | "- [ ] [\(.description)](\($file)#L\(.beginLine))"')"
           echo "$mess"
-          
+          # echo "mess-detection=$(echo "$mess")" >> $GITHUB_ENV
           
       - name: Create team sync issue
         run: |
