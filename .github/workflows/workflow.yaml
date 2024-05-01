@@ -13,7 +13,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Set up PHP
-        uses: tyler-technologies-dsd/github-actions-reusable-workflows/setup-php@main
+        uses: shivammathur/setup-php@v2
         with:
           php-version: 8.2
           tools: phpmd/phpmd
