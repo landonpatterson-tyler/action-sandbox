@@ -19,8 +19,7 @@ jobs:
           tools: phpmd/phpmd
       - name: Mess Detection
         run: |
-          ~/.composer/vendor/bin/phpmd . json cleancode --suffixes php --exclude vendor,tests | 
-          mess=$(echo jq -c '.files[] | .file as $file | .violations[] | "- [ ] [\(.description)](\($file)#L\(.beginLine))"')
+          mess=$(~/.composer/vendor/bin/phpmd . json cleancode --suffixes php --exclude vendor,tests | jq -c '.files[] | .file as $file | .violations[] | "- [ ] [\(.description)](\($file)#L\(.beginLine))"')
 
           echo "mess-detection=$mess" >> $GITHUB_ENV
           
