@@ -19,7 +19,7 @@ jobs:
           tools: phpmd/phpmd
       - name: Mess Detection
         run: |
-          echo "mess-detection=$(phpmd . text cleancode --suffixes php --exclude vendor,tests)" >> $GITHUB_ENV
+          echo "mess-detection=$(phpmd . github cleancode --suffixes php --exclude vendor,tests)" >> $GITHUB_ENV
           
       - name: Create team sync issue
         run: |
