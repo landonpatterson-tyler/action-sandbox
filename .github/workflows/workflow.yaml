@@ -19,9 +19,9 @@ jobs:
           tools: phpmd/phpmd
       - name: Mess Detection
         run: |
-          mess="cat << EOF $(~/.composer/vendor/bin/phpmd . json cleancode --suffixes php --exclude vendor,tests | jq -r '.files[] | .file as $file | .violations[] | "- [ ] [\(.description)](\($file)#L\(.beginLine))"') EOF"
+          mess="$(~/.composer/vendor/bin/phpmd . json cleancode --suffixes php --exclude vendor,tests | jq -r '.files[] | .file as $file | .violations[] | "- [ ] [\(.description)](\($file)#L\(.beginLine))"')"
+          echo "$mess"
           
-          echo "mess-detection=$mess" >> $GITHUB_ENV
           
       - name: Create team sync issue
         run: |
