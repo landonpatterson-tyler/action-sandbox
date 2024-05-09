@@ -20,8 +20,8 @@ jobs:
       - name: Mess Detection
         run: |
           mess="$(~/.composer/vendor/bin/phpmd . json cleancode --suffixes php --exclude vendor,tests | jq -r '.files[] | .file as $file | .violations[] | "- [ ] [\(.description)](\($file)#L\(.beginLine))"')"
-          test=$(echo "$mess")
-          echo "mess-detection=$test" >> $GITHUB_ENV
+          test="$(echo "$mess")"
+          echo "$test" >> $GITHUB_ENV
           
       - name: Create team sync issue
         run: |
