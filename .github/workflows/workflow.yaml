@@ -40,6 +40,15 @@ jobs:
           
       - name: Create team sync issue
         run: |
+          BODY="### PHPMD Clean Code Violations\n\n" # Add a title if desired
+          if [[ $PHPMD_CLEAN_CODE_VIOLATIONS == 'true' ]]; then
+            for var in "${!VIOLATION_@}"; do
+              BODY+="${!var}\n"  # Append each violation to the body
+            done
+          else
+            BODY+="- [x] No PHPMD clean code violations found\n"
+          fi
+
           if [[ $CLOSE_PREVIOUS == true ]]; then
             previous_issue_number=$(gh issue list \
               --label "$LABELS" \
@@ -64,9 +73,5 @@ jobs:
           TITLE: Test
           ASSIGNEES: landonpatterson-tyler
           LABELS: enhancement
-          BODY: |
-            ### Messes
-
-            ${{ env.mess }}
           PINNED: false
           CLOSE_PREVIOUS: true
