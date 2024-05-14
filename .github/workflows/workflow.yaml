@@ -67,6 +67,6 @@ jobs:
           BODY: |
             ### Messes
 
-            ${{ env.mess-detection }}
+            ${{ env.mess }}
           PINNED: false
           CLOSE_PREVIOUS: true
