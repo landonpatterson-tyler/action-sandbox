@@ -45,7 +45,8 @@ jobs:
           if [[ $PHPMD_CLEAN_CODE_VIOLATIONS == 'true' ]]; then
             for var in "${!VIOLATION_@}"; do
               BODY+="
-              ${!var}"  # Append each violation to the body
+              $(echo "${!var}" | xargs)
+          "
             done
           else
             BODY+="
