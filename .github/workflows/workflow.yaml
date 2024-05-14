@@ -40,17 +40,12 @@ jobs:
           
       - name: Create team sync issue
         run: |
-          BODY="### PHPMD Clean Code Violations
-          " # Add a title if desired
-          if [[ $PHPMD_CLEAN_CODE_VIOLATIONS == 'true' ]]; then
-            for var in "${!VIOLATION_@}"; do
-              BODY+="$(echo "${!var}\" | xargs)"
-            done
-          else
-            BODY+="
-            - [x] No PHPMD clean code violations found
-            "
-          fi
+          BODY=$(cat <<EOF
+          ### PHPMD Clean Code Violations
+          
+          $([ "$PHPMD_CLEAN_CODE_VIOLATIONS" == 'true' ] && (echo "${!VIOLATION_@}" | tr ' ' '\n')) || echo "- [x] No PHPMD clean code violations found"
+          EOF
+          )
 
           if [[ $CLOSE_PREVIOUS == true ]]; then
             previous_issue_number=$(gh issue list \
