@@ -20,8 +20,12 @@ jobs:
       - name: Mess Detection
         run: |
           mess="$(~/.composer/vendor/bin/phpmd . json cleancode --suffixes php --exclude vendor,tests | jq -r '.files[] | .file as $file | .violations[] | "- [ ] [\(.description)](\($file)#L\(.beginLine))"')"
-          mess="### PHPMD Clean Code Violations\n\n$mess"
-          echo "$mess" >> $GITHUB_ENV
+          # Prepend a header to the Markdown if violations exist
+          echo "PHPMD_CLEAN_CODE_VIOLATIONS=true" >> $GITHUB_ENV
+          while IFS= read -r line; do
+            echo "${prefix}${violation_counter}=${line}" >> $GITHUB_ENV
+            violation_counter=$((violation_counter + 1))
+          done <<< "$mess"
           
       - name: Create team sync issue
         run: |
