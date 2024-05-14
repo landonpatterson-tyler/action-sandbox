@@ -44,7 +44,7 @@ jobs:
           " # Add a title if desired
           if [[ $PHPMD_CLEAN_CODE_VIOLATIONS == 'true' ]]; then
             for var in "${!VIOLATION_@}"; do
-              BODY+="$(echo "${!var}" | xargs)\"
+              BODY+="$(echo "${!var}\" | xargs)"
             done
           else
             BODY+="
