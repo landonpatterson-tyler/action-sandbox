@@ -46,7 +46,8 @@ jobs:
             for var in "${!VIOLATION_@}"; do
               trimmed_line="${!var#"${!var%%[![:space:]]*}"}"   # Remove leading whitespace
               trimmed_line="${trimmed_line%"${trimmed_line##*[![:space:]]}"}"  # Remove trailing whitespace
-              BODY+="${trimmed_line}<br>"  # Append line with <br> and newline
+              BODY+="${trimmed_line}
+              "
             done
           else
             BODY+="<br>- [x] No PHPMD clean code violations found<br>"
