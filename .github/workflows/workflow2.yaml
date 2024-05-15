@@ -1,0 +1,70 @@
+name: PHPMD Code Analysis
+
+on:
+  push:
+    branches:
+      - main # Adjust to your branch name(s)
+
+jobs:
+  phpmd:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.1' # Adjust PHP version as needed
+
+      - name: Install PHPMD
+        run: composer global require phpmd/phpmd
+
+      - name: Run PHPMD Analysis
+        run: phpmd src text controversial,cleancode,codesize,design,naming,unusedcode --reportfile phpmd_report.xml
+
+      - name: Parse PHPMD Results
+        id: parse_results
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const xml2js = require('xml2js');
+            const fs = require('fs');
+            
+            const parser = new xml2js.Parser();
+            const rawXml = fs.readFileSync('phpmd_report.xml', 'utf-8');
+            
+            parser.parseString(rawXml, (err, result) => {
+              if (err) throw err;
+              
+              const violations = result.pmd.file.flatMap(file => file.violation.map(violation => ({
+                filename: file.$.name,
+                rule: violation.$.rule,
+                ruleset: violation.$.ruleset,
+                line: violation.$.beginline,
+                message: violation._
+              })));
+              
+              const markdownTable = `| Filename | Rule | Ruleset | Line | Message |\n|---|---|---|---|---|\n` +
+                violations.map(v => `| ${v.filename} | ${v.rule} | ${v.ruleset} | ${v.line} | ${v.message} |`).join('\n');
+              
+              core.setOutput('violationsFound', violations.length > 0);
+              core.setOutput('markdownTable', markdownTable);
+            });
+
+      - name: Create Issue (if violations found)
+        if: steps.parse_results.outputs.violationsFound == 'true'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const markdownTable = '${{ steps.parse_results.outputs.markdownTable }}';
+
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: 'PHPMD Violations Detected',
+              body: markdownTable,
+              labels: ['phpmd']
+            });
