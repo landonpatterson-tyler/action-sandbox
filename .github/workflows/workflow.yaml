@@ -40,7 +40,8 @@ jobs:
           
       - name: Create team sync issue
         run: |
-          BODY="### PHPMD Clean Code Violations<br>" # Add a title if desired
+          BODY="### PHPMD Clean Code Violations
+          "
           if [[ $PHPMD_CLEAN_CODE_VIOLATIONS == 'true' ]]; then
             for var in "${!VIOLATION_@}"; do
               trimmed_line="${!var#"${!var%%[![:space:]]*}"}"   # Remove leading whitespace
