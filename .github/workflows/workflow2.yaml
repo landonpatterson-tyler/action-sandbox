@@ -17,9 +17,10 @@ jobs:
         with:
           tools: phpmd/phpmd
           php-version: '8.1' # Adjust PHP version as needed
-
+      - name: Create Temporary Directory
+        run: mkdir -p /tmp/phpmd-reports
       - name: Run PHPMD Analysis
-        run: ~/.composer/vendor/bin/phpmd . xml cleancode --suffixes php --exclude vendor,tests --reportfile ${{ github.workspace }}/phpmd_report.xml
+        run: ~/.composer/vendor/bin/phpmd . xml cleancode --suffixes php --exclude vendor,tests --reportfile /tmp/phpmd-reports/phpmd_report.xml
 
       - name: Parse PHPMD Results
         id: parse_results
