@@ -21,7 +21,7 @@ jobs:
         run: composer global require phpmd/phpmd
 
       - name: Run PHPMD Analysis
-        run: phpmd . text controversial,cleancode,codesize,design,naming,unusedcode --reportfile phpmd_report.xml
+        run: ~/.composer/vendor/bin/phpmd . text controversial,cleancode,codesize,design,naming,unusedcode --reportfile phpmd_report.xml
 
       - name: Parse PHPMD Results
         id: parse_results
