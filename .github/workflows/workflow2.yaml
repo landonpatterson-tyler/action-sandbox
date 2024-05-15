@@ -19,7 +19,7 @@ jobs:
           php-version: '8.1' # Adjust PHP version as needed
 
       - name: Run PHPMD Analysis
-        run: ~/.composer/vendor/bin/phpmd . xml cleancode --suffixes php --exclude vendor,tests --reportfile phpmd_report.xml
+        run: ~/.composer/vendor/bin/phpmd . xml cleancode --suffixes php --exclude vendor,tests --reportfile ${{ github.workspace }}/phpmd_report.xml
 
       - name: Parse PHPMD Results
         id: parse_results
