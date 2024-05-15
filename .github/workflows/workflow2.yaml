@@ -64,7 +64,7 @@ jobs:
                 --title "$TITLE" \
                 --assignee "$ASSIGNEES" \
                 --label "$LABELS" \
-                --body "$BODY")
+                --body "")
             if [[ $PINNED == true ]]; then
                 gh issue pin "$new_issue_url"
             fi
