@@ -20,6 +20,8 @@ jobs:
 
       - name: Run PHPMD
         run: phpmd . json cleancode --reportfile phpmd-report.json --ignore-violations-on-exit
+      - name: cat file
+        run: echo $(cat phpmd-report.json)
 
       - name: Create Issue
         env:
