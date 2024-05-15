@@ -18,43 +18,33 @@ jobs:
           tools: phpmd/phpmd
           php-version: '8.1' # Adjust PHP version as needed
       - name: Run PHPMD Analysis
-        run: ~/.composer/vendor/bin/phpmd . xml cleancode --suffixes php --exclude vendor,tests --reportfile phpmd_report.xml --ignore-violations-on-exit
+        run: ~/.composer/vendor/bin/phpmd . json cleancode --suffixes php --exclude vendor,tests --reportfile phpmd_report.json --ignore-violations-on-exit
 
       - name: Parse PHPMD Results
         id: parse_results
         uses: actions/github-script@v6
         with:
           script: |
-
-            await exec('npm', ['install', 'xml2js'], {
-                cwd: __dirname
-            });
-
-            const xml2js = require('xml2js');
             const fs = require('fs');
 
-            const parser = new xml2js.Parser();
-            const rawXml = fs.readFileSync('${{ github.workspace }}/phpmd_report.xml', 'utf-8');
+            const rawJson = fs.readFileSync('${{ github.workspace }}/phpmd_report.json', 'utf-8');
+            const result = JSON.parse(rawJson);
 
-            parser.parseString(rawXml, (err, result) => {
-                if (err) throw err;
+            const violations = result.files?.flatMap(file => file.violations.map(violation => ({
+              filename: file.fileName,
+              rule: violation.rule,
+              ruleset: violation.ruleSet,
+              line: violation.beginLine,
+              message: violation.description
+            }))) || [];
 
-                const violations = result.pmd.file?.flatMap(file => file.violation?.map(violation => ({
-                filename: file.$.name,
-                rule: violation.$.rule,
-                ruleset: violation.$.ruleset,
-                line: violation.$.beginline,
-                message: violation._
-                }))) || [];
+            const markdownTable = violations.length > 0 ?
+              `| Filename | Rule | Ruleset | Line | Message |\n|---|---|---|---|---|\n` +
+              violations.map(v => `| ${v.filename} | ${v.rule} | ${v.ruleset} | ${v.line} | ${v.message} |`).join('\n') :
+              "No PHPMD violations found.";
 
-                const markdownTable = violations.length > 0 ?
-                `| Filename | Rule | Ruleset | Line | Message |\n|---|---|---|---|---|\n` +
-                violations.map(v => `| ${v.filename} | ${v.rule} | ${v.ruleset} | ${v.line} | ${v.message} |`).join('\n') :
-                "No PHPMD violations found.";
-
-                core.setOutput('violationsFound', violations.length > 0);
-                core.setOutput('markdownTable', markdownTable);
-            });
+            core.setOutput('violationsFound', violations.length > 0);
+            core.setOutput('markdownTable', markdownTable);
 
       - name: Create Issue (if violations found)
         if: steps.parse_results.outputs.violationsFound == 'true'
