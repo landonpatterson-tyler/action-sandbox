@@ -25,7 +25,6 @@ jobs:
         uses: actions/github-script@v6
         with:
           script: |
-            const { exec } = require('@actions/exec');
 
             await exec('npm', ['install', 'xml2js'], {
                 cwd: __dirname
