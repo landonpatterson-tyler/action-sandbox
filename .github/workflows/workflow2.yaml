@@ -19,11 +19,7 @@ jobs:
           tools: phpmd
 
       - name: Run PHPMD
-        run: phpmd . xml cleancode --reportfile phpmd-report.xml --ignore-violations-on-exit
-
-      - name: Convert XML to JSON
-        run: |
-          php -r '$xml = simplexml_load_file("phpmd-report.xml"); echo json_encode($xml, JSON_PRETTY_PRINT);' > phpmd-report.json
+        run: phpmd . json cleancode --reportfile phpmd-report.json --ignore-violations-on-exit
 
       - name: Create Issue
         env:
