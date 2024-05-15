@@ -40,14 +40,13 @@ jobs:
             parser.parseString(rawXml, (err, result) => {
                 if (err) throw err;
 
-                // (Rest of your XML parsing logic as before...)
                 const violations = result.pmd.file?.flatMap(file => file.violation?.map(violation => ({
                 filename: file.$.name,
                 rule: violation.$.rule,
                 ruleset: violation.$.ruleset,
                 line: violation.$.beginline,
                 message: violation._
-                }))) || [];  // Handle case where there are no violations
+                }))) || [];
 
                 const markdownTable = violations.length > 0 ?
                 `| Filename | Rule | Ruleset | Line | Message |\n|---|---|---|---|---|\n` +
