@@ -39,20 +39,23 @@ jobs:
 
             parser.parseString(rawXml, (err, result) => {
                 if (err) throw err;
-              
-              const violations = result.pmd.file.flatMap(file => file.violation.map(violation => ({
+
+                // (Rest of your XML parsing logic as before...)
+                const violations = result.pmd.file?.flatMap(file => file.violation?.map(violation => ({
                 filename: file.$.name,
                 rule: violation.$.rule,
                 ruleset: violation.$.ruleset,
                 line: violation.$.beginline,
                 message: violation._
-              })));
-              
-              const markdownTable = `| Filename | Rule | Ruleset | Line | Message |\n|---|---|---|---|---|\n` +
-                violations.map(v => `| ${v.filename} | ${v.rule} | ${v.ruleset} | ${v.line} | ${v.message} |`).join('\n');
-              
-              core.setOutput('violationsFound', violations.length > 0);
-              core.setOutput('markdownTable', markdownTable);
+                }))) || [];  // Handle case where there are no violations
+
+                const markdownTable = violations.length > 0 ?
+                `| Filename | Rule | Ruleset | Line | Message |\n|---|---|---|---|---|\n` +
+                violations.map(v => `| ${v.filename} | ${v.rule} | ${v.ruleset} | ${v.line} | ${v.message} |`).join('\n') :
+                "No PHPMD violations found.";
+
+                core.setOutput('violationsFound', violations.length > 0);
+                core.setOutput('markdownTable', markdownTable);
             });
 
       - name: Create Issue (if violations found)
