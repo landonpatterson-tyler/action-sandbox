@@ -19,7 +19,7 @@ jobs:
           tools: phpmd
 
       - name: Run PHPMD
-        run: phpmd . xml phpmd.xml --reportfile phpmd-report.xml --ignore-violations-on-exit
+        run: phpmd . xml cleancode --reportfile phpmd-report.xml --ignore-violations-on-exit
 
       - name: Convert XML to JSON
         run: |
