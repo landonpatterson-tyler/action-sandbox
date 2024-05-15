@@ -30,7 +30,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           REPORT=$(cat phpmd-report.json)
-          ISSUES=$(echo "$REPORT" | jq -r '.file[] | "\n- **File:** \(.name)\n  **Violations:**\n" + ( .violation[] | "    - \(.rule): \(.description)" )')
+          ISSUES=$(echo "$REPORT" | jq -r '.file[] | select(.violation != null) | "\n- **File:** \(.name)\n  **Violations:**\n" + ( .violation[] | "    - \(.rule): \(.description)" )')
 
           TITLE="PHPMD Analysis Report"
           BODY="## PHPMD Analysis Results\n\n$ISSUES\n\nPlease review and address these issues."
