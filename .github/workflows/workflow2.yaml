@@ -15,10 +15,8 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
+          tools: phpmd/phpmd
           php-version: '8.1' # Adjust PHP version as needed
-
-      - name: Install PHPMD
-        run: composer global require phpmd/phpmd
 
       - name: Run PHPMD Analysis
         run: ~/.composer/vendor/bin/phpmd . text controversial,cleancode,codesize,design,naming,unusedcode --reportfile phpmd_report.xml
