@@ -1,80 +1,39 @@
-name: PHPMD Code Analysis
+name: PHPMD Analysis
 
 on:
   push:
     branches:
-      - main # Adjust to your branch name(s)
+      - main  # Adjust the branch name if needed
 
 jobs:
   phpmd:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          tools: phpmd/phpmd
-          php-version: '8.1' # Adjust PHP version as needed
-      - name: Run PHPMD Analysis
-        run: ~/.composer/vendor/bin/phpmd . json cleancode --suffixes php --exclude vendor,tests --reportfile phpmd_report.json --ignore-violations-on-exit
+          php-version: '8.1'  # Adjust PHP version if needed
+          tools: phpmd
 
-      - name: Parse PHPMD Results
-        id: parse_results
-        uses: actions/github-script@v6
-        with:
-          script: |
-            const fs = require('fs');
+      - name: Run PHPMD
+        run: phpmd . xml phpmd.xml --reportfile phpmd-report.xml --ignore-violations-on-exit
 
-            const rawJson = fs.readFileSync('${{ github.workspace }}/phpmd_report.json', 'utf-8');
-            const result = JSON.parse(rawJson);
-
-            const violations = result.files?.flatMap(file => file.violations.map(violation => ({
-              filename: file.fileName,
-              rule: violation.rule,
-              ruleset: violation.ruleSet,
-              line: violation.beginLine,
-              message: violation.description
-            }))) || [];
-
-            const markdownTable = violations.length > 0 ?
-              `| Filename | Rule | Ruleset | Line | Message |\n|---|---|---|---|---|\n` +
-              violations.map(v => `| ${v.filename} | ${v.rule} | ${v.ruleset} | ${v.line} | ${v.message} |`).join('\n') :
-              "No PHPMD violations found.";
-
-            core.setOutput('violationsFound', violations.length > 0);
-            core.setOutput('markdownTable', markdownTable);
-
-      - name: Create Issue (if violations found)
-        if: steps.parse_results.outputs.violationsFound == 'true'
-           
+      - name: Convert XML to JSON
         run: |
-            if [[ $CLOSE_PREVIOUS == true ]]; then
-                previous_issue_number=$(gh issue list \
-                --label "$LABELS" \
-                --json number \
-                --jq '.[0].number')
-                if [[ -n $previous_issue_number ]]; then
-                gh issue close "$previous_issue_number"
-                gh issue unpin "$previous_issue_number"
-                fi
-            fi
-            new_issue_url=$(gh issue create \
-                --title "$TITLE" \
-                --assignee "$ASSIGNEES" \
-                --label "$LABELS" \
-                --body "")
-            if [[ $PINNED == true ]]; then
-                gh issue pin "$new_issue_url"
-            fi
-        env:
-            GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-            GH_REPO: ${{ github.repository }}
-            TITLE: Test
-            ASSIGNEES: landonpatterson-tyler
-            LABELS: enhancement
-            PINNED: false
-            CLOSE_PREVIOUS: true
+          php -r '$xml = simplexml_load_file("phpmd-report.xml"); echo json_encode($xml, JSON_PRETTY_PRINT);' > phpmd-report.json
 
-            
+      - name: Create Issue
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          REPORT=$(cat phpmd-report.json)
+          ISSUES=$(echo "$REPORT" | jq -r '.file[] | "\n- **File:** \(.name)\n  **Violations:**\n" + ( .violation[] | "    - \(.rule): \(.description)" )')
+
+          TITLE="PHPMD Analysis Report"
+          BODY="## PHPMD Analysis Results\n\n$ISSUES\n\nPlease review and address these issues."
+
+          PAYLOAD=$(echo '{}' | jq --arg title "$TITLE" --arg body "$BODY" '.title = $title | .body = $body')
+          curl -s -X POST -H "Authorization: Bearer $GITHUB_TOKEN" -H "Content-Type: application/json" -d "$PAYLOAD" "https://api.github.com/repos/$GITHUB_REPOSITORY/issues"
