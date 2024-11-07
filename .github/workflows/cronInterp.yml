@@ -32,7 +32,7 @@ jobs:
           # Run cronstrue to interpret the cron expression
           DESCRIPTION=$(npx cronstrue "$CRON_STRING")
           echo "Cron description: $DESCRIPTION"
-          echo "::set-output name=description::$DESCRIPTION"
+          echo "description=$DESCRIPTION" >> $GITHUB_OUTPUT
 
       - name: Show Description
         run: |
