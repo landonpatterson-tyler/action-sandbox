@@ -27,10 +27,7 @@ jobs:
       - name: Interpret Cron Schedule
         id: interpret
         run: |
-          # Remove "cron(" prefix and ")" suffix if provided, for compatibility
           CRON_STRING="${{ github.event.inputs.cron_string }}"
-          CRON_STRING="${CRON_STRING#cron(}"
-          CRON_STRING="${CRON_STRING%)"
 
           # Run cronstrue to interpret the cron expression
           DESCRIPTION=$(npx cronstrue "$CRON_STRING")
