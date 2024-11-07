@@ -38,4 +38,5 @@ jobs:
           echo "::set-output name=description::$DESCRIPTION"
 
       - name: Show Description
-        run: echo "Human-readable cron schedule: ${{ steps.interpret.outputs.description }}"
+        run: |
+          echo "Human-readable cron schedule: ${{ steps.interpret.outputs.description }}"
