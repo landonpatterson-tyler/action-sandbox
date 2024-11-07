@@ -1,0 +1,41 @@
+name: Interpret Cron Schedule with cronstrue
+
+on:
+  workflow_dispatch:
+    inputs:
+      cron_string:
+        description: 'Enter the cron string to interpret (e.g., 0 * * * *)'
+        required: true
+        default: '0 * * * *'
+
+jobs:
+  interpret-cron:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '16'
+
+      - name: Install cronstrue
+        run: npm install -g cronstrue
+
+      - name: Interpret Cron Schedule
+        id: interpret
+        run: |
+          # Remove "cron(" prefix and ")" suffix if provided, for compatibility
+          CRON_STRING="${{ github.event.inputs.cron_string }}"
+          CRON_STRING="${CRON_STRING#cron(}"
+          CRON_STRING="${CRON_STRING%)"
+
+          # Run cronstrue to interpret the cron expression
+          DESCRIPTION=$(npx cronstrue "$CRON_STRING")
+          echo "Cron description: $DESCRIPTION"
+          echo "::set-output name=description::$DESCRIPTION"
+
+      - name: Show Description
+        run: echo "Human-readable cron schedule: ${{ steps.interpret.outputs.description }}"
