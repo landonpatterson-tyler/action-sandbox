@@ -16,6 +16,6 @@ jobs:
           INPUT_BRANCH_NAME: ${{ inputs.branch-name }}
         shell: bash
       - name: hey
-        run: echo "ECR_$(echo $branch_name | tr '[:lower:]' '[:upper:]')_ROLE"
+        run: echo "ECR_$(echo env.branch_name | tr '[:lower:]' '[:upper:]')_ROLE"
   
       
