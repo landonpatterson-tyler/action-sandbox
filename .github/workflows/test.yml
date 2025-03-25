@@ -14,6 +14,10 @@ jobs:
   test_job:
     runs-on: ubuntu-latest
     steps:
+      - name: Get Trigger Branch
+        run: echo "Get Trigger Branch"
+        env:
+          branch: ${{ github.base_ref || github.ref_name }}
       - name: Check for Prod Deploy
         if: ${{ (inputs.branch-name == 'master' || inputs.branch-name == 'main') }}
         run: echo "branch_name=PRD" >> $GITHUB_ENV
@@ -33,5 +37,7 @@ jobs:
         env:
           TTT: ${{ format('ECR-{0}-ROLE', env.branch_name) }}
         run: echo ${{ env.TTT }}
+      - name: ff
+        run: echo ${{env.branch}}
   
       
