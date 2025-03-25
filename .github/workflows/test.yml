@@ -11,7 +11,7 @@ jobs:
         shell: bash
       - name: Check for Dev/UAT Deploy
         if: ${{ inputs.branch-name != 'master' && inputs.branch-name != 'main' }}
-        run: echo "branch_name=$INPUT_BRANCH_NAME^^" >> $GITHUB_ENV
+        run: echo "branch_name=${INPUT_BRANCH_NAME^^}" >> $GITHUB_ENV
         env:
           INPUT_BRANCH_NAME: ${{ inputs.branch-name }}
         shell: bash
