@@ -28,6 +28,6 @@ jobs:
         run: echo ${{ env.branch_name }}
   
       - name: hey
-        run: echo ${{ format('ECR-{0}-ROLE', env.branch_name) }}
+        run: echo ${{ format('ECR-{0^^}-ROLE', env.branch_name) }}
   
       
