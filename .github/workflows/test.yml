@@ -5,5 +5,17 @@ jobs:
   test_job:
     runs-on: ubuntu-latest
     steps:
+      - name: Check for Prod Deploy
+        if: ${{ (inputs.branch-name == 'master' || inputs.branch-name == 'main') && inputs.is-vip == 'false' }}
+        run: echo "branch_name=PRD" >> $GITHUB_ENV
+        shell: bash
+      - name: Check for Dev/UAT Deploy
+        if: ${{ inputs.branch-name != 'master' && inputs.branch-name != 'main' }}
+        run: echo "branch_name=$INPUT_BRANCH_NAME^^" >> $GITHUB_ENV
+        env:
+          INPUT_BRANCH_NAME: ${{ inputs.branch-name }}
+        shell: bash
       - name: hey
-        run: echo 'hey'
+        run: echo ${{ format('ECR_{0}_ROLE', env.branch_name) }}
+  
+      
